@@ -1,7 +1,14 @@
-export default function SectionHeader({ title, right }: { title: string; right?: React.ReactNode }) {
+import type { ReactNode } from "react";
+
+type Props = {
+  title: ReactNode;        // ← was string
+  right?: ReactNode;
+};
+
+export default function SectionHeader({ title, right }: Props) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+    <div className="flex items-center justify-between p-4">
+      <div className="text-xl font-semibold">{title}</div>
       {right}
     </div>
   );

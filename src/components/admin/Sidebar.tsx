@@ -8,11 +8,12 @@ import {
     PanelLeftClose, PanelLeftOpen
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
+import { useAuth } from "@/hooks/AuthContext";
+// ...
 type Item = { href: string; label: string; icon: React.ComponentType<{ size?: number; className?: string }> };
 
 const items: Item[] = [
-    { href: "/", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/", label: "Overview", icon: LayoutDashboard },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/questions", label: "Questions", icon: HelpCircle },
     { href: "/admin/avatars", label: "Avatars", icon: ImageIcon },
@@ -34,6 +35,7 @@ export default function Sidebar() {
     const [width, setWidth] = useState(FULL_W);
     const [mobileOpen, setMobileOpen] = useState(false);
     const resizingRef = useRef(false);
+    const { user, guest, logout } = useAuth();
 
     // Load saved state
     useEffect(() => {
@@ -159,6 +161,7 @@ export default function Sidebar() {
                             );
                         })}
                     </nav>
+                    <button onClick={logout} className="btn">Logout</button>
 
                     <div className="mt-auto p-4 text-[11px] text-gray-500">
                         © {new Date().getFullYear()} QuizMaster Admin

@@ -1,9 +1,31 @@
-import useSWR, { SWRConfiguration, SWRResponse } from "swr";
+// lib/swr.ts
+import useSWR, { SWRConfiguration, SWRResponse, mutate as globalMutate } from "swr";
 
-export const fetcher = async (url: string) => {
-    const res = await fetch(url, { credentials: "same-origin" });
+const API = process.env.NEXT_PUBLIC_API_URL!; // http://localhost:3001 in dev
+
+function buildHeaders(init?: RequestInit): Headers {
+    const h = new Headers(init?.headers as HeadersInit);
+    if (!h.has("Content-Type")) h.set("Content-Type", "application/json");
+
+    // Read JWT from localStorage (no cookies)
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (token && !h.has("Authorization")) h.set("Authorization", `Bearer ${token}`);
+
+    return h;
+}
+
+const toURL = (key: string) => (key.startsWith("http") ? key : `${API}${key}`);
+
+export const fetcher = async (key: string, init?: RequestInit) => {
+    const res = await fetch(toURL(key), {
+        // IMPORTANT: no credentials here (so ACAO:* is okay)
+        // credentials: "same-origin" is the default; leave it out
+        ...init,
+        headers: buildHeaders(init),
+    });
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    return res.status === 204 ? null : res.json();
 };
 
 export const swrConfig: SWRConfiguration = {
@@ -12,5 +34,5 @@ export const swrConfig: SWRConfiguration = {
     keepPreviousData: true,
 };
 
-export { useSWR }; export type { SWRResponse };
-
+export { useSWR, globalMutate };
+export type { SWRResponse };
